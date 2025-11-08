@@ -8,7 +8,7 @@
 * Jan Žemlička
 
 ### Abstract
-TBD
+TBD (project description, how is MCU used,...)
 
 [**Video demonstration of our project - TBD**]()
 
@@ -16,11 +16,11 @@ TBD
 
 ## Hardware description
 
-TBD
+TBD (List of electronic components, justification of component choices,...)
 
-## Software description
+## Software design
 
-TBD
+TBD (block diagrams, flowcharts, pseudocodes, library documentations...)
 
 ## References
 
