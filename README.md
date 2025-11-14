@@ -7,16 +7,30 @@
 * Vojtěch Krehan
 * Jan Žemlička
 
-### Abstract
+## Project description
 TBD (project description, how is MCU used,...)
 
 [**Video demonstration of our project - TBD**]()
 
 ![Project poster - TBD]("A3 project poster")
 
-## Hardware description
+## List of hardware components
 
-TBD (List of electronic components, justification of component choices,...)
+* Arduino Nano - main unit
+
+##### Modules
+
+* [HY-SRF05 precision ultrasonic sensor](datasheets/m475c.pdf) - for obstacle distance measurement (may use 2 sensors)
+* I2C OLED display 128x32, SSD1306 driver
+* [TCS3472 RGB color sensor](datasheets/TCS3472_en.pdf) - for color mark recognition on the track
+
+##### Components
+
+* [L293D](datasheets/l293d.pdf) - driver used for engine control
+* DC motor N20 (500rpm/6V) - 2x
+* IR LED diode - as an IR transmitter - 4x
+* IR phototransistor - as an IR receiver - 4x
+* buttons, stabilizer, connectors, batteries ...
 
 ## Software design
 
