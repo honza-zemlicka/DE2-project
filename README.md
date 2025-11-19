@@ -17,7 +17,7 @@ The system has integrated RGB sensor for recognizing color markers on the path, 
 		
 The application also allows user to configurate parametrs such as speed, controller settings or predefined obstacle size. These parameters can be adjusted by rotary encoder and desplayed on a OLED display. The encoder is used for navigation through settings meanwhile the display provides instant visual feedback.
 		
-To communicate with the hardware, the project uses libraries for GPIO control, timer operations and also for OLED dispay managing. These modules take care of the essential operations needed for the robot to work properly. That includes reading sensor values, controlling the motors, keeping timing accurate and displaying information on the screen.
+To communicate with the hardware, the project uses libraries for GPIO control, timer operations and also for OLED display managing. These modules take care of essential operations needed for the robot to work properly. That includes reading sensor values, controlling the motors, keeping timing accurate and displaying information on the screen.
 		
 To sum up, this project demonstrates self-operating, C-programmed robot that is capable of adapting its response to different track conditions, obstacles and user-defined parameters.
 
