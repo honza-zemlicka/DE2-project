@@ -1,46 +1,60 @@
+/*
+ * Testing app for ultra sound sensor for robot line follower.
+ * Target: AVR ATmega328P
+ */
+#ifndef F_CPU
+#define F_CPU 16000000UL
+#endif
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdlib.h>
 
 #include "uart.h"
-#include "ultrasonic.h"
+#include "ultrasound.h"
 
+/**
+ * @brief Helper function to print integer over UART.
+ */
 static void uart_print_uint16(uint16_t value)
 {
     char buf[10];
-    itoa(value, buf, 10);
+    itoa(value, buf, 10); // integer to string in base 10
     uart_puts(buf);
 }
 
 int main(void)
 {
-    // UART 9600 baud (16 MHz clock)
     uart_init(UART_BAUD_SELECT(9600, F_CPU));
+
     sei();
 
-    ultrasonic_init();
+    ultrasound_init();
 
     while (1)
     {
-        float distance_cm_f = ultrasonic_read();
+        // measure distance in mm
+        uint16_t distance_mm = ultrasound_read_mm();
 
-        // If 0.0 => timeout / no echo
-        if (distance_cm_f == 0.0f)
+        if (distance_mm == 0)
         {
-            uart_puts("No echo / out of range\r\n");
+            uart_puts("Error: Out of range\r\n");
         }
         else
         {
-            // rounding
-            uint16_t distance_cm = (uint16_t)(distance_cm_f);
+            // mm to cm conversion
+            uint16_t cm_whole = distance_mm / 10;
+            uint16_t cm_dec   = distance_mm % 10;
 
-            uart_puts("Distance: ");
-            uart_print_uint16(distance_cm);
+            uart_puts("Dist: ");
+            uart_print_uint16(cm_whole);
+            uart_puts(".");
+            uart_print_uint16(cm_dec);
             uart_puts(" cm\r\n");
         }
 
-        // delay between measurements so echoes don't overlap
+        // wait 100ms before next measurement
         _delay_ms(100);
     }
 

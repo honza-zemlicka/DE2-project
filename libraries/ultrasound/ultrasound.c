@@ -1,4 +1,4 @@
-#include "ultrasonic.h"
+#include "ultrasound.h"
 #define F_CPU 16000000UL
 
 #include <avr/io.h>
@@ -76,7 +76,7 @@ float ultrasonic_read(void)
     time_us = pulseIn(30000);
 
     if (time_us == 0) {
-        return 0.0f;
+        return 0.0;
     }
 
     // Přepočet na vzdálenost v cm:
