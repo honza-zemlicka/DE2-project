@@ -8,9 +8,9 @@
 * Jan Žemlička
 
 ## Project description
-This project presents an autonomous robot designed for single-line following and obstacle detection. Upon startup, the robot performs a calibration routine to distinguish between black and white surfaces in the current ambient light. It utilizes a control algorithm to follow the line by adjusting the speed of individual motors based on the robot's deviation from the followed line.
+This project presents an autonomous robot designed for single-line following and obstacle detection. Upon startup, the robot performs a calibration routine to distinguish between black and white surfaces in the current lighting conditions. It utilizes a proportional control algorithm to follow the line by adjusting the speed of individual motors based on the robot's deviation from the followed path.
 		
-An ultrasonic sensor measures the distance from obstacles, allowing the robot to adjust its speed or initiate maneuvers to avoid collision. Additionally, an integrated RGB sensor detects color markers on the path, enabling specific actions based on the color recognized.
+An ultrasonic sensor measures the distance from obstacles, allowing the robot to adjust its speed or initiate maneuvers to avoid collisions. Additionally, an integrated RGB sensor detects color markers on the path, enabling specific actions based on the color recognized.
 		
 Users can configure parameters such as robot speed, controller settings, and obstacle thresholds via a rotary encoder and an OLED display. The encoder is used for menu navigation, while the display provides visual feedback.
 
