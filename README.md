@@ -43,10 +43,10 @@ The robot’s firmware, written in C, utilizes libraries for GPIO control, timer
 
 ## Software design
 
-![Main loop](images/main%20loop%20flowchart.jpg "Main loop flowchart")
+<img src="images/main%20loop%20flowchart.jpg" alt="Main loop flowchart" width="50%">
 > Main loop flowchart
 
-![Calibration](images/calibration%20flowchart.jpg "Calibration flowchart")
+<img src="images/calibration%20flowchart.jpg" alt="Calibration flowchart" width="50%">
 > Calibration loop flowchart
 
 ## References
