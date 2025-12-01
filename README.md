@@ -20,7 +20,10 @@ The robot’s firmware, written in C, utilizes libraries for GPIO control, timer
 
 ![Project poster - TBD]("A3 project poster")
 
-## List of hardware components
+## Hardware description
+
+![Block diagram](images/block%20diagram.jpg "Block diagram")
+> Hardware block diagram
 
 * Arduino Nano - main controller unit
 
@@ -40,8 +43,15 @@ The robot’s firmware, written in C, utilizes libraries for GPIO control, timer
 
 ## Software design
 
-TBD (block diagrams, flowcharts, pseudocodes, library documentations...)
+![Main loop](images/main%20loop%20flowchart.jpg "Main loop flowchart")
+> Main loop flowchart
+
+![Calibration](images/calibration%20flowchart.jpg "Calibration flowchart")
+> Calibration loop flowchart
 
 ## References
 
 - https://github.com/tomas-fryza/avr-labs
+- https://miro.com/
+- https://chatgpt.com/
+- https://gemini.google.com/
