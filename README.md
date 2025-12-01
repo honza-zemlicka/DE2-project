@@ -43,11 +43,21 @@ The robot’s firmware, written in C, utilizes libraries for GPIO control, timer
 
 ## Software design
 
-<img src="images/main%20loop%20flowchart.jpg" alt="Main loop flowchart" width="30%">
-> Main loop flowchart
+<div align="center">
+    <img src="images/main%20loop%20flowchart.jpg" width="20%">
+    <br>
+    <em>Main loop flowchart</em>
+</div>
 
-<img src="images/calibration%20flowchart.jpg" alt="Calibration flowchart" width="30%">
-> Calibration loop flowchart
+The program initializes peripherals (ADC, I2C, PWM) and runs calibration before entering an infinite control loop that reads analog sensors to calculate deviation from track and drive motors via PWM. It also handles periodic ultrasound & RGB tasks. Upon pressing a button, the robot main loop enters stopped state to pause and resume execution.
+
+<div align="center">
+<img src="images/calibration%20flowchart.jpg" width="20%">
+    <br>
+    <em>Calibration loop flowchart</em>
+</div>
+
+This routine clears sensor variables and enters a loop to continuously sample IR sensors values, updating the minimum and maximum thresholds. The calibration process is looped until a manual button press confirms completion, turning off the status LED and returning to the main loop.
 
 ## References
 
