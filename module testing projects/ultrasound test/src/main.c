@@ -35,7 +35,7 @@ int main(void)
     while (1)
     {
         // measure distance in mm
-        uint16_t distance_mm = ultrasound_read_mm();
+        uint16_t distance_mm = ultrasound_read();
 
         if (distance_mm == 0)
         {
