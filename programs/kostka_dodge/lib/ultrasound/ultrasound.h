@@ -17,9 +17,7 @@
 #define US_ECHO_PINR PINB
 #define US_ECHO_PIN  PB1
 
-
 // --- Function Prototypes ---
-
 /**
  * @brief Initialize the ultrasonic sensor pins.
  * Sets TRIG as output and ECHO as input.
