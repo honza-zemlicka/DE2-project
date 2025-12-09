@@ -22,7 +22,7 @@ The robot’s firmware, written in C, utilizes libraries for GPIO control, timer
 
 ## Hardware description
 
-![Block diagram](images/block%20diagram.jpg "Block diagram")
+![Block diagram](images/block%20diagram.png "Block diagram")
 > Hardware block diagram
 
 * Arduino Nano - main controller unit
@@ -44,7 +44,7 @@ The robot’s firmware, written in C, utilizes libraries for GPIO control, timer
 ## Software design
 
 <div align="center">
-    <img src="images/main%20loop%20flowchart.jpg" width="30%">
+    <img src="images/main%20loop%20flowchart.png" width="30%">
     <br>
     <em>Main loop flowchart</em>
 </div>
