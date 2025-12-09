@@ -18,12 +18,13 @@ uint16_t S4K[2] = {0, 0};
 // [0] white (peak 1000)
 // [1] black (peak 300)
 
-int8_t error, correction;
+int16_t error;
+int16_t correction;
 
-uint8_t S1, S2, S3, S4;
+int16_t S1, S2, S3, S4;
 
 static inline int16_t map(int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max);
-static uint8_t constrain(int8_t val, uint8_t min, uint8_t max);
+static int16_t constrain(int16_t val, int8_t min, int8_t max);
 
 void auto_calibration();
 void robot_stop();
@@ -32,8 +33,8 @@ void dodge_object();
 volatile uint8_t count = 0;
 volatile uint8_t calib_tick = 0;
 
-uint8_t motor_speed = 120;
-uint8_t gain_kp = 10; // jako float, ale jak zobrazit na displeji?
+uint8_t motor_speed = 80;
+uint8_t gain_kp = 2; // jako float, ale jak zobrazit na displeji?
 char display_buffer[16];
 
 uint8_t robot_run = 0;
@@ -175,14 +176,19 @@ int main(void)
     S3 = map(analog_read(SENSOR_RR), S3K[1], S3K[0], 0, 100);
     S4 = map(analog_read(SENSOR_LL), S4K[1], S4K[0], 0, 100);
 
-    error = S1 - S2;
+    error = S2 - S1;
     correction = error * gain_kp;
 
-    pwm_write(&PORTD, MOTOR_LF, motor_speed + correction);
-    pwm_write(&PORTD, MOTOR_RF, motor_speed - correction);
+    //pwm_write(&PORTD, MOTOR_LF, motor_speed + correction);
+    //pwm_write(&PORTD, MOTOR_RF, motor_speed - correction);
+
+    pwm_write(&PORTD, MOTOR_LF, constrain(motor_speed + correction, 0, 130));
+    pwm_write(&PORTD, MOTOR_RF, constrain(motor_speed - correction, 0, 130));
+
+    // rychlost 80, kp = 2, constrain 130
 
     // --- MĚŘENÍ VZDÁLENOSTI KAŽDÝCH cca 320 ms ---
-    if (count == 20)
+    /*if (count == 20)
     {
       gpio_write_high(&PORTB, USER_LED);
 
@@ -196,7 +202,7 @@ int main(void)
       _delay_ms(500);
       gpio_write_low(&PORTB, USER_LED);
       count = 0; // Vynulovat počítadlo
-    }
+    }*/
 
     if (gpio_read(&PIND, BUTTON) == 0)
     {
@@ -218,10 +224,10 @@ void auto_calibration()
 
   calib_tick = 0;
 
-  while (calib_tick < 200)
+  while (calib_tick < 150)
   {
-    pwm_write(&PORTB, MOTOR_LB, 200);
-    pwm_write(&PORTD, MOTOR_RF, 200);
+    pwm_write(&PORTB, MOTOR_LB, 150);
+    pwm_write(&PORTD, MOTOR_RF, 150);
 
     S1 = analog_read(SENSOR_CR);
     S2 = analog_read(SENSOR_CL);
@@ -267,7 +273,7 @@ static inline int16_t map(int16_t x, int16_t in_min, int16_t in_max, int16_t out
   return (int32_t)(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-static uint8_t constrain(int8_t val, uint8_t min, uint8_t max)
+static int16_t constrain(int16_t val, int8_t min, int8_t max)
 {
   uint8_t motor = 0;
   if (val <= min)
@@ -306,32 +312,30 @@ void dodge_object(void)
 
     // 1. Uhnutí vpravo (90 stupňů)
     // Levé kolo jede, pravé stojí -> ostrá zatáčka
-    pwm_write(&PORTD, MOTOR_LF, 0);
+    pwm_write(&PORTD, MOTOR_LF, 10);
     pwm_write(&PORTD, MOTOR_RF, 100);
-    _delay_ms(500); // Čas pro otočení cca 90° (nutno odladit v praxi)
+    _delay_ms(800); // Čas pro otočení cca 90° (nutno odladit v praxi)
 
     // 2. Objíždění překážky (oblouk) + čekání na čáru
     // Jede v oblouku tak dlouho, dokud nenajede zpět na čáru
     pwm_write(&PORTD, MOTOR_LF, 100);
-    pwm_write(&PORTD, MOTOR_RF, 65);
+    pwm_write(&PORTD, MOTOR_RF, 75);
     
     // Zpoždění, aby robot hned po otočení nechytil čáru, kterou právě opustil
     _delay_ms(200); 
 
-    while (1)
+    do
     {
-        // Nutné číst senzory uvnitř smyčky!
+        pwm_write(&PORTD, MOTOR_LF, 100);
+        pwm_write(&PORTD, MOTOR_RF, 75);
+        
         S1 = map(analog_read(SENSOR_CR), S1K[1], S1K[0], 0, 100);
         S2 = map(analog_read(SENSOR_CL), S2K[1], S2K[0], 0, 100);
 
-        // Podmínka návratu: Pokud alespoň jeden senzor uvidí černou (hodnota > práh)
-        // Používám práh 20 (místo < 1), protože 0-1 je příliš přísné kvůli šumu.
-        // Logika: Opakuj dokud (S1 je bílá A SOUČASNĚ S2 je bílá)
-        if (S1 > 20 || S2 > 20) 
-        {
-            break; // Vidím čáru, ukončit objíždění
-        }
-    }
+        //S1 = analog_read(SENSOR_CR);
+        //S2 = analog_read(SENSOR_CL);
+
+    } while ((S2 > 30) || (S1 > 30));
 
     // 3. Srovnání do směru čáry (otočení vlevo)
     // Levé kolo pomalu, pravé rychle -> srovnání

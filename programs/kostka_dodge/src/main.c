@@ -47,13 +47,10 @@ void dodge_object(void)
         pwm_write(&PORTD, MOTOR_LF, 100);
         pwm_write(&PORTD, MOTOR_RF, 75);
         
-        //S1 = map(analog_read(SENSOR_CR), S1K[1], S1K[0], 0, 100);
-        //S2 = map(analog_read(SENSOR_CL), S2K[1], S2K[0], 0, 100);
+        S1 = map(analog_read(SENSOR_CR), S1K[1], S1K[0], 0, 100);
+        S2 = map(analog_read(SENSOR_CL), S2K[1], S2K[0], 0, 100);
 
-        S1 = analog_read(SENSOR_CR);
-        S2 = analog_read(SENSOR_CL);
-
-    } while ((S2 > 300) || (S1 > 300));
+    } while ((S2 > 30) || (S1 > 30));
 
     _delay_ms(200);
 
