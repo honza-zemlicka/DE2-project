@@ -3,6 +3,7 @@
 
 /**
  * @file 
+ * @defgroup Ultrasound Library <ultrasound.h>
  * @code #include <ultrasound.h> @endcode
  *
  * @brief Library for controlling HY-SRF05 / HC-SR04 ultrasonic sensors.
