@@ -188,8 +188,8 @@ int main(void)
 
       uint16_t distance = ultrasound_read(); // Změřit vzdálenost v cm
 
-      // Pokud je překážka blíže než 15 cm (hodnotu si uprav dle potřeby)
-      if (distance > 0 && distance < 15) 
+      // Pokud je překážka blíže než 7,5 mm
+      if (distance > 0 && distance < 75) 
       {
          dodge_object(); // Zavolá vyhýbací manévr
       }

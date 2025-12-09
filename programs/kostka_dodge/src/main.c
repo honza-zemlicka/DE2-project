@@ -17,34 +17,54 @@
 
 #define OBSTACLE_DIST 75 // Reaction distance in mm (20 cm)
 
+uint16_t S1, S2, S3, S4;
+
+uint16_t S1K[2] = {800, 100};
+uint16_t S2K[2] = {800, 100};
+uint16_t S3K[2] = {800, 100};
+uint16_t S4K[2] = {800, 100};
+
+static inline int16_t map(int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max);
+
+
 volatile uint8_t count = 0;
 
-// Function for obstacle avoidance maneuver
 void dodge_object(void)
 {
-    PORTB |= (1 << USER_LED);
+    // Rozsvítit LED - signalizace manévru
+    gpio_write_high(&PORTB, USER_LED);
 
-    // 2. Evasive maneuver - Turn RIGHT
-    // Left wheel drives, right stops -> sharp right turn
-    pwm_write(&PORTD, MOTOR_LF, 0);
-    pwm_write(&PORTD, MOTOR_RF, 100);
-    _delay_ms(1000); // Turn duration
-
-    // 3. Bypassing obstacle - Drive STRAIGHT / ARC
-    // Both wheels drive, robot passes the obstacle
-    pwm_write(&PORTD, MOTOR_LF, 100);
-    pwm_write(&PORTD, MOTOR_RF, 65);
-    _delay_ms(3000); // Duration of driving alongside the obstacle
-
-    // 4. Return to direction - Turn LEFT
-    // Left wheel stops, right drives -> sharp left turn back
+    // 1. Uhnutí vpravo (90 stupňů)
+    // Levé kolo jede, pravé stojí -> ostrá zatáčka
     pwm_write(&PORTD, MOTOR_LF, 10);
     pwm_write(&PORTD, MOTOR_RF, 100);
-    _delay_ms(350); // Duration of straightening direction
+    _delay_ms(1000); // Čas pro otočení cca 90° (nutno odladit v praxi)
 
-    // 5. End of maneuver - LED OFF
-    // No need to stop, main loop continues with straight driving immediately
-    PORTB &= ~(1 << USER_LED);
+    // 2. Objíždění překážky (oblouk) + čekání na čáru
+    // Jede v oblouku tak dlouho, dokud nenajede zpět na čáru
+    do
+    {
+        pwm_write(&PORTD, MOTOR_LF, 100);
+        pwm_write(&PORTD, MOTOR_RF, 75);
+        
+        //S1 = map(analog_read(SENSOR_CR), S1K[1], S1K[0], 0, 100);
+        //S2 = map(analog_read(SENSOR_CL), S2K[1], S2K[0], 0, 100);
+
+        S1 = analog_read(SENSOR_CR);
+        S2 = analog_read(SENSOR_CL);
+
+    } while ((S2 > 300) || (S1 > 300));
+
+    _delay_ms(200);
+
+    // 3. Srovnání do směru čáry (otočení vlevo)
+    // Levé kolo pomalu, pravé rychle -> srovnání
+    pwm_write(&PORTD, MOTOR_LF, 10);
+    pwm_write(&PORTD, MOTOR_RF, 100);
+    _delay_ms(350); // Čas na srovnání (nutno odladit)
+
+    // Zhasnout LED
+    gpio_write_low(&PORTB, USER_LED);
 }
 
 int main(void)
@@ -54,17 +74,23 @@ int main(void)
     gpio_mode_output(&DDRD, MOTOR_RF);
     gpio_mode_output(&DDRB, USER_LED);
 
+    gpio_mode_input(&DDRC, SENSOR_CR);
+    gpio_mode_input(&DDRC, SENSOR_CL);
+    gpio_mode_input(&DDRC, SENSOR_RR);
+    gpio_mode_input(&DDRC, SENSOR_LL);
+
     ultrasound_init();
     pwm_init();
+    adc_init();
+    pwm_write(&PORTD, MOTOR_LF, 0);
+    pwm_write(&PORTD, MOTOR_RF, 0);
+
 
     // Timer setup (kept from original code)
     tim2_ovf_16ms();
     tim2_ovf_enable();
     sei();
 
-    // Initial start
-    pwm_write(&PORTD, MOTOR_LF, 0);
-    pwm_write(&PORTD, MOTOR_RF, 0);
     _delay_ms(1000); // Short pause after reset
 
     while (1)
@@ -72,14 +98,9 @@ int main(void)
         uint16_t distance = ultrasound_read();
 
         // 3. Control logic
-        if (distance > 0 && distance < 75)
+        if (distance > 0 && distance < 75) 
         {
-            // OBSTACLE: Perform maneuver
-            // uart_puts("Obstacle detected! Avoiding...\r\n");
-            dodge_object();
-
-            // After function completion, robot returns to "else" branch (drive straight)
-            // in next loop iteration, unless another obstacle is immediately ahead.
+         dodge_object(); // Zavolá vyhýbací manévr
         }
         else
         {
@@ -92,6 +113,11 @@ int main(void)
         //_delay_ms(60);
     }
     return 0;
+}
+
+static inline int16_t map(int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max)
+{
+  return (int32_t)(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 ISR(TIMER2_OVF_vect)
