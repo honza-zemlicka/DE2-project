@@ -3,24 +3,22 @@
 #include <avr/io.h>        // AVR device-specific IO definitions
 #include <avr/interrupt.h> // Interrupts standard C library for AVR-GCC
 #include <stdio.h>         // C library. Needed for `sprintf`
-//#include "timer.h"
+// #include "timer.h"
 #include <gpio.h>
 #include <util/delay.h>
 #include <oled.h>
 #include "robot_definitions.h"
 
+// variables
+
+// calibration arrays: [0] = white, [1] = black
+// typical values: 1000 white, 300 black
 uint16_t S1K[2] = {0, 0};
 uint16_t S2K[2] = {0, 0};
 uint16_t S3K[2] = {0, 0};
 uint16_t S4K[2] = {0, 0};
 
-// 1000 White - 300 Black
-
-// [0] white
-// [1] black
-
 int8_t error, correction;
-
 uint8_t S1, S2, S3, S4;
 
 static inline int16_t map(int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max);
@@ -29,28 +27,33 @@ static uint8_t constrain(int8_t val, uint8_t min, uint8_t max);
 void auto_calibration();
 void robot_stop();
 
+// calibration timer counter
 volatile uint8_t calib_tick = 0;
 
+// control variables
 uint8_t motor_speed = 255;
-uint8_t gain_kp = 10;   // jako float, ale jak zobrazit na displeji?
+uint8_t gain_kp = 10; // jako float, ale jak zobrazit na displeji?
 char display_buffer[16];
-
 uint8_t robot_run = 0;
 
-volatile uint32_t ir_data = 0;
-volatile uint8_t bit_index = 0;
-volatile uint32_t frame_received = 0;
-volatile uint8_t rx_bytes = 0;
+// IR remote variables
+volatile uint32_t ir_data = 0;        // storing received IR code
+volatile uint8_t bit_index = 0;       // current bit position
+volatile uint32_t frame_received = 0; // storage for valid frame
+volatile uint8_t rx_bytes = 0;        // byte counter
 
-volatile uint8_t last_time = 0;
-volatile uint8_t measured = 0;
-volatile uint8_t length = 0;
+volatile uint8_t last_time = 0; // timer value of previous edge
+volatile uint8_t measured = 0;  // current timer value
+volatile uint8_t length = 0;    // pulse length
 volatile uint8_t reception_complete = 0;
 
+// ext definitions
 const char *encode_cmd(uint8_t command);
-
 const char *message;
 
+// functions
+
+// updates OLED display with current Kp and speed values
 void update_display()
 {
   oled_gotoxy(17, 0);
@@ -64,6 +67,7 @@ void update_display()
   oled_display();
 }
 
+// initialize timer2 for IR & calibration timing
 void timer2_init()
 {
   TCCR2A = 0;                                       // normal mode
@@ -71,27 +75,31 @@ void timer2_init()
   TCNT2 = 0;
 }
 
+// initialize external interrupt0 (IR receiver)
 void int0_init()
 {
   EICRA = (1 << ISC01) | (1 << ISC00); // INT0 = rising edge
   EIMSK = (1 << INT0);                 // enable INT0
 }
 
+// ISR for decoding pulse width (IR receiver)
 ISR(INT0_vect)
 {
   uint8_t measured = TCNT2;
   uint8_t length = measured - last_time;
 
-  // Start bit
-  if (length > 60 && length < 100) // 5 062 us / 64 = 79 tics
+  // Check for start bit
+  // Duration 5062 us / 64 us = 79 tics
+  if (length > 60 && length < 100)
   {
     ir_data = 0;
     bit_index = 0;
     frame_received = 0;
   }
 
-  // High
-  if (length > 25 && length < 45) // 2 249 us / 64 = 35 tics
+  // Check for HIGH
+  // Duration 2249 us / 64 us = 35 tics
+  if (length > 25 && length < 45)
   {
     // ir_data |= (1 << bit_index);
     ir_data <<= 1;
@@ -99,30 +107,41 @@ ISR(INT0_vect)
     bit_index++;
   }
 
-  // Low
-  if (length > 7 && length < 25) // 1 124 us / 64 = 17,5 tics
+  // Check for HIGH
+  // Duration 1124  us / 64 us = 17,5 tics
+  if (length > 7 && length < 25)
   {
     // ir_data |= (0 << bit_index);
     ir_data <<= 1;
     bit_index++;
   }
 
+  // Checks if full frame is received
   if (bit_index == frame_length)
   {
-    EIMSK &= ~(1 << INT0); // disable INT0
+    EIMSK &= ~(1 << INT0); // disable INT0 to process data
     rx_bytes++;
-    gpio_toggle(&PORTB, PB5);
+    gpio_toggle(&PORTB, PB5); // indicates RX
 
     TCNT2 = 0;
     reception_complete = 1;
-    encode_frame();
+    encode_frame(); // process the received frame
     // return;
   }
   last_time = measured;
 }
 
+// ISR for calibration
+ISR(TIMER2_OVF_vect)
+{
+  calib_tick++;
+}
+
+// MAIN
+
 int main(void)
 {
+  // INITIALIZATION
   gpio_mode_output(&DDRD, MOTOR_LF);
   gpio_mode_output(&DDRD, MOTOR_RF);
   gpio_mode_output(&DDRB, MOTOR_LB);
@@ -137,7 +156,7 @@ int main(void)
 
   timer2_init();
   int0_init();
-  sei();
+  sei(); // enable global interrupts
 
   twi_init();
   oled_init(OLED_DISP_ON);
@@ -164,16 +183,20 @@ int main(void)
   _delay_ms(800);
   auto_calibration();
 
+  // main loop
   while (1)
   {
+    // read IR sensors and map values to 0-100 range based on calibration
     S1 = map(analog_read(SENSOR_CR), S1K[1], S1K[0], 0, 100);
     S2 = map(analog_read(SENSOR_CL), S2K[1], S2K[0], 0, 100);
     S3 = map(analog_read(SENSOR_RR), S3K[1], S3K[0], 0, 100);
     S4 = map(analog_read(SENSOR_LL), S4K[1], S4K[0], 0, 100);
 
+    // calculate deviation from track
     error = S1 - S2;
     correction = error * gain_kp;
 
+    // drive motors based on correction
     pwm_write(&PORTD, MOTOR_LF, motor_speed + correction);
     pwm_write(&PORTD, MOTOR_RF, motor_speed - correction);
 
@@ -183,9 +206,10 @@ int main(void)
       count = 0;
     }*/
 
+    // stop mode
     if (gpio_read(&PIND, BUTTON) == 0)
     {
-      // pridat debounce
+      // !! pridat debounce --- DE2-PROJECT_V01-03 !!
       _delay_ms(300);
       robot_stop();
     }
@@ -193,10 +217,12 @@ int main(void)
   return 0;
 }
 
+// cal function
 void auto_calibration()
 {
   gpio_write_high(&PORTB, USER_LED);
 
+  // set up min(black)/max(white) with current values
   S1K[0] = S1K[1] = analog_read(SENSOR_CR);
   S2K[0] = S2K[1] = analog_read(SENSOR_CL);
   S3K[0] = S3K[1] = analog_read(SENSOR_RR);
@@ -204,6 +230,7 @@ void auto_calibration()
 
   calib_tick = 0;
 
+  // spins the robot and samples values
   while (calib_tick < 200)
   {
     pwm_write(&PORTB, MOTOR_LB, 120);
@@ -214,6 +241,7 @@ void auto_calibration()
     S3 = analog_read(SENSOR_RR);
     S4 = analog_read(SENSOR_LL);
 
+    // update max (white) and min (black) values
     if (S1 > S1K[0])
       S1K[0] = S1;
     else if (S1 < S1K[1])
@@ -234,9 +262,12 @@ void auto_calibration()
     else if (S4 < S4K[1])
       S4K[1] = S4;
   }
+
+  // stop motors after calibration
   pwm_write(&PORTB, MOTOR_LB, 0);
   pwm_write(&PORTD, MOTOR_RF, 0);
 
+  // waits for button press to break calibration loop
   while (1)
   {
     if (gpio_read(&PIND, BUTTON) == 0)
@@ -247,11 +278,13 @@ void auto_calibration()
   }
 }
 
+// map function to remap a number between ranges
 static inline int16_t map(int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max)
 {
   return (int32_t)(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+// constrain function for limiting value in a given range
 static uint8_t constrain(int8_t val, uint8_t min, uint8_t max)
 {
   uint8_t motor = 0;
@@ -264,17 +297,12 @@ static uint8_t constrain(int8_t val, uint8_t min, uint8_t max)
   return motor;
 }
 
-ISR(TIMER2_OVF_vect)
-{
-  calib_tick++;
-}
-
 void robot_stop()
 {
   while (gpio_read(&PIND, BUTTON) == 1)
   {
     _delay_ms(300);
-    // pridat debounce
+    // !! pridat debounce --- DE2-PROJECT_V01-03 !!
     gpio_write_high(&PORTB, USER_LED);
     pwm_write(&PORTD, MOTOR_LF, 0);
     pwm_write(&PORTD, MOTOR_RF, 0);
