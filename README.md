@@ -60,7 +60,7 @@ This routine clears sensor variables and enters a loop to continuously sample IR
 
 ### Doxygen documentation 
 
-[Open Documentation](Doxygen_html/index.html)
+[Open Documentation](https://honza-zemlicka.github.io/DE2-project/Doxygen/html/index.html)
 
 ## References
 
