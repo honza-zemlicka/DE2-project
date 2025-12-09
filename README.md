@@ -58,6 +58,10 @@ The program initializes peripherals (ADC, I2C, PWM) and runs calibration before 
 
 This routine clears sensor variables and enters a loop to continuously sample IR sensors values, updating the minimum and maximum thresholds. The calibration process is looped until a manual button press confirms completion, turning off the status LED and returning to the main loop.
 
+### Doxygen documentation 
+
+[Open Documentation](Doxygen_html/index.html)
+
 ## References
 
 - https://github.com/tomas-fryza/avr-labs
