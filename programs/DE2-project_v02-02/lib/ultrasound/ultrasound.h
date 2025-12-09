@@ -1,10 +1,19 @@
 #ifndef ULTRASOUND_H
 #define ULTRASOUND_H
 
-/** 
- * @brief Ultrasound Library for HY-SRF05
- * Dependencies: gpio.h, avr/io.h
+/**
+ * @file 
+ * @code #include <ultrasound.h> @endcode
+ *
+ * @brief Library for controlling HY-SRF05 / HC-SR04 ultrasonic sensors.
+ *
+ * The library contains functions for initializing the sensor and measuring 
+ * distance.
+ *
+ * @note Dependencies: gpio.h, avr/io.h, util/delay.h
+ * @{
  */
+
 
 #include <stdint.h>
 #include <avr/io.h>
