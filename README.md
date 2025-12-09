@@ -31,7 +31,6 @@ The robot’s firmware, written in C, utilizes libraries for GPIO control, timer
 
 * [HY-SRF05 precision ultrasonic sensor](datasheets/m475c.pdf) - for obstacle distance measurement (may use 2 sensors)
 * I2C OLED display 128x32, SSD1306 driver
-* [TCS3472 RGB color sensor](datasheets/TCS3472_en.pdf) - for color mark recognition on the track
 
 ##### Components
 
