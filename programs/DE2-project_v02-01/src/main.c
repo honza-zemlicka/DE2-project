@@ -78,6 +78,7 @@ int main(void)
   update_display();
 
   adc_init();
+  ultrasound_init();
 
   pwm_init();
   pwm_write(&PORTD, MOTOR_LF, 0);
@@ -105,10 +106,8 @@ int main(void)
       pwm_write(&PORTD, MOTOR_RF, constrain(motor_speed - correction, 0, 130));
 
       // --- MĚŘENÍ VZDÁLENOSTI KAŽDÝCH cca 320 ms ---
-      /*if (count == 20)
+      if (count == 20)
       {
-        gpio_write_high(&PORTB, USER_LED);
-
         uint16_t distance = ultrasound_read(); // Změřit vzdálenost v cm
 
         // Pokud je překážka blíže než 7,5 mm
@@ -116,10 +115,8 @@ int main(void)
         {
            dodge_object(); // Zavolá vyhýbací manévr
         }
-        _delay_ms(500);
-        gpio_write_low(&PORTB, USER_LED);
         count = 0; // Vynulovat počítadlo
-      }*/
+      }
     }
 
     if (gpio_read(&PIND, BUTTON) == 0)
@@ -274,14 +271,14 @@ void dodge_object(void)
 
   // 1. Uhnutí vpravo (90 stupňů)
   // Levé kolo jede, pravé stojí -> ostrá zatáčka
-  pwm_write(&PORTD, MOTOR_LF, 10);
-  pwm_write(&PORTD, MOTOR_RF, 100);
-  _delay_ms(500); // Čas pro otočení cca 90° (nutno odladit v praxi)
+  pwm_write(&PORTD, MOTOR_LF, 30);
+  pwm_write(&PORTD, MOTOR_RF, 120);
+  _delay_ms(1000); // Čas pro otočení cca 90° (nutno odladit v praxi)
 
   // 2. Objíždění překážky (oblouk) + čekání na čáru
   // Jede v oblouku tak dlouho, dokud nenajede zpět na čáru
-  pwm_write(&PORTD, MOTOR_LF, 100);
-  pwm_write(&PORTD, MOTOR_RF, 75);
+  pwm_write(&PORTD, MOTOR_LF, 120);
+  pwm_write(&PORTD, MOTOR_RF, 95);
 
   // Zpoždění, aby robot hned po otočení nechytil čáru, kterou právě opustil
   _delay_ms(200);
@@ -298,8 +295,8 @@ void dodge_object(void)
 
   // 3. Srovnání do směru čáry (otočení vlevo)
   // Levé kolo pomalu, pravé rychle -> srovnání
-  pwm_write(&PORTD, MOTOR_LF, 10);
-  pwm_write(&PORTD, MOTOR_RF, 100);
+  pwm_write(&PORTD, MOTOR_LF, 30);
+  pwm_write(&PORTD, MOTOR_RF, 120);
   _delay_ms(350); // Čas na srovnání (nutno odladit)
 
   // Zhasnout LED
