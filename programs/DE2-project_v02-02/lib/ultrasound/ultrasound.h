@@ -1,9 +1,9 @@
 #ifndef ULTRASOUND_H
 #define ULTRASOUND_H
 
-/*
- * Ultrasound Library for HY-SRF05
- * Dependencies: gpio.h
+/** 
+ * @brief Ultrasound Library for HY-SRF05
+ * Dependencies: gpio.h, avr/io.h
  */
 
 #include <stdint.h>
@@ -25,8 +25,9 @@
 void ultrasound_init(void);
 
 /**
- * @brief Measure distance and return it in millimeters.
- * @return Distance in mm (uint16_t). Returns 0 if out of range or timeout.
+ * @brief Distance measurement.
+ * Generates a trigger pulse and measures the response duration.
+ * @return Distance in mm. Returns 0 if out of range or timeout.
  */
 uint16_t ultrasound_read(void);
 
