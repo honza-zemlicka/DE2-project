@@ -14,6 +14,14 @@
 #define USER_LED PB5 // Arduino D13
 #define BUTTON PD3   // Arduino D3, pullup
 
+#define US_TRIG_DDR  DDRB
+#define US_TRIG_PORT PORTB
+#define US_TRIG_PIN  PB0
+
+#define US_ECHO_DDR  DDRD
+#define US_ECHO_PINR PIND
+#define US_ECHO_PIN  PD7
+
 #define frame_length 32
 // 32-bit + start bit
 
@@ -32,4 +40,8 @@
 #define SPEED_MINUS_1 0x88
 #define SPEED_MINUS_10 0xc8
 
+#endif
+
+#ifndef F_CPU
+#define F_CPU 16000000UL
 #endif

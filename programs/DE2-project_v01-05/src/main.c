@@ -1,4 +1,4 @@
-// -Eppur si muove-  line-follower v01-04
+// -Eppur si muove-  line-follower v01-05
 
 #include <avr/io.h>        // AVR device-specific IO definitions
 #include <avr/interrupt.h> // Interrupts standard C library for AVR-GCC
@@ -7,6 +7,7 @@
 #include <gpio.h>
 #include <util/delay.h>
 #include <oled.h>
+#include <ultrasound.h>
 #include "robot_definitions.h"
 
 uint16_t S1K[2] = {0, 0};
@@ -26,10 +27,12 @@ static uint8_t constrain(int8_t val, uint8_t min, uint8_t max);
 
 void auto_calibration();
 void robot_stop();
+void dodge_object();
 
+volatile uint8_t count = 0;
 volatile uint8_t calib_tick = 0;
 
-uint8_t motor_speed = 255;
+uint8_t motor_speed = 120;
 uint8_t gain_kp = 10; // jako float, ale jak zobrazit na displeji?
 char display_buffer[16];
 
@@ -160,6 +163,8 @@ int main(void)
   pwm_write(&PORTB, MOTOR_LB, 0);
   pwm_write(&PORTB, MOTOR_RB, 0);
 
+  ultrasound_init();
+
   _delay_ms(800);
   auto_calibration();
 
@@ -176,11 +181,22 @@ int main(void)
     pwm_write(&PORTD, MOTOR_LF, motor_speed + correction);
     pwm_write(&PORTD, MOTOR_RF, motor_speed - correction);
 
-    /*if(count == 20)
+    // --- MĚŘENÍ VZDÁLENOSTI KAŽDÝCH cca 320 ms ---
+    if (count == 20)
     {
-      ultrasound();
-      count = 0;
-    }*/
+      gpio_write_high(&PORTB, USER_LED);
+
+      uint16_t distance = ultrasound_read(); // Změřit vzdálenost v cm
+
+      // Pokud je překážka blíže než 15 cm (hodnotu si uprav dle potřeby)
+      if (distance > 0 && distance < 15) 
+      {
+         dodge_object(); // Zavolá vyhýbací manévr
+      }
+      _delay_ms(500);
+      gpio_write_low(&PORTB, USER_LED);
+      count = 0; // Vynulovat počítadlo
+    }
 
     if (gpio_read(&PIND, BUTTON) == 0)
     {
@@ -266,6 +282,7 @@ static uint8_t constrain(int8_t val, uint8_t min, uint8_t max)
 ISR(TIMER2_OVF_vect)
 {
   calib_tick++;
+  count++;
 }
 
 void robot_stop()
@@ -282,10 +299,51 @@ void robot_stop()
   _delay_ms(200);
 }
 
-/*void ultrasound()
+void dodge_object(void)
 {
+    // Rozsvítit LED - signalizace manévru
+    gpio_write_high(&PORTB, USER_LED);
 
-}*/
+    // 1. Uhnutí vpravo (90 stupňů)
+    // Levé kolo jede, pravé stojí -> ostrá zatáčka
+    pwm_write(&PORTD, MOTOR_LF, 0);
+    pwm_write(&PORTD, MOTOR_RF, 100);
+    _delay_ms(500); // Čas pro otočení cca 90° (nutno odladit v praxi)
+
+    // 2. Objíždění překážky (oblouk) + čekání na čáru
+    // Jede v oblouku tak dlouho, dokud nenajede zpět na čáru
+    pwm_write(&PORTD, MOTOR_LF, 100);
+    pwm_write(&PORTD, MOTOR_RF, 65);
+    
+    // Zpoždění, aby robot hned po otočení nechytil čáru, kterou právě opustil
+    _delay_ms(200); 
+
+    while (1)
+    {
+        // Nutné číst senzory uvnitř smyčky!
+        S1 = map(analog_read(SENSOR_CR), S1K[1], S1K[0], 0, 100);
+        S2 = map(analog_read(SENSOR_CL), S2K[1], S2K[0], 0, 100);
+
+        // Podmínka návratu: Pokud alespoň jeden senzor uvidí černou (hodnota > práh)
+        // Používám práh 20 (místo < 1), protože 0-1 je příliš přísné kvůli šumu.
+        // Logika: Opakuj dokud (S1 je bílá A SOUČASNĚ S2 je bílá)
+        if (S1 > 20 || S2 > 20) 
+        {
+            break; // Vidím čáru, ukončit objíždění
+        }
+    }
+
+    // 3. Srovnání do směru čáry (otočení vlevo)
+    // Levé kolo pomalu, pravé rychle -> srovnání
+    pwm_write(&PORTD, MOTOR_LF, 10);
+    pwm_write(&PORTD, MOTOR_RF, 100);
+    _delay_ms(350); // Čas na srovnání (nutno odladit)
+
+    // Zhasnout LED
+    gpio_write_low(&PORTB, USER_LED);
+    
+    // Návrat do hlavního loopu, kde převezme řízení PID
+}
 
 const char *encode_cmd(uint8_t command)
 {

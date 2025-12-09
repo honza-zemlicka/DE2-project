@@ -200,18 +200,6 @@ void pwm_init()
  */
 void pwm_write(volatile uint8_t *reg, uint8_t pin, uint8_t val)   // val must be in range 0 - 255
 {
-  if(val == 0)    // special case - 0
-  {
-    gpio_write_low(*reg, pin);
-    return;
-  }
-
-  if(val == 255)    // special case - 255
-  {
-    gpio_write_high(*reg, pin);
-    return;
-  }
-
   switch(pin)
   {
     // ---TIMER 0---
