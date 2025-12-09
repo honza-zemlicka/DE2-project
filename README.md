@@ -16,7 +16,7 @@ Users can configure parameters as robot speed and control gain via remote IR con
 
 The robot’s firmware, written in C, utilizes libraries from [DE2 AVR course](https://github.com/tomas-fryza/avr-labs) – gpio, oled & twi libraries (+ uart for troubleshooting). Additionally, an ultrasound library was created to handle sensor's initialization & distance calculation.
 
-[**Video demonstration of our project**](https://youtu.be/tJKh0oyu3Gs?si=n_vKxXadf_YJ9QNw)
+### [**Video demonstration of our project**](https://youtu.be/tJKh0oyu3Gs?si=n_vKxXadf_YJ9QNw)
 
 ![Project poster](images/poster.png "A3 project poster")
 
@@ -62,7 +62,7 @@ The program initializes peripherals (ADC, I2C, PWM & ultrasound) and runs calibr
 
 This routine clears sensor variables and enters a loop to continuously sample IR sensors values, updating the minimum (black) and maximum (white) thresholds. The calibration process is looped until a manual button press confirms completion, turning off the status LED and returning to the main loop.
 
-[### Doxygen Documentation](https://honza-zemlicka.github.io/DE2-project/Doxygen_html/index.html)
+### [Doxygen Documentation](https://honza-zemlicka.github.io/DE2-project/Doxygen_html/index.html)
 
 ## References
 
