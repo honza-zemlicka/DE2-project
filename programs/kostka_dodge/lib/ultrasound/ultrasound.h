@@ -13,9 +13,9 @@
 #define US_TRIG_PORT PORTB
 #define US_TRIG_PIN  PB0
 
-#define US_ECHO_DDR  DDRB
-#define US_ECHO_PINR PINB
-#define US_ECHO_PIN  PB1
+#define US_ECHO_DDR  DDRD
+#define US_ECHO_PINR PIND
+#define US_ECHO_PIN  PD7
 
 // --- Function Prototypes ---
 /**
