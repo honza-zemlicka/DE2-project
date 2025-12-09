@@ -76,14 +76,14 @@ uint8_t gpio_read(volatile uint8_t *reg, uint8_t pin);
 /**
 * @brief    Configure one input pin without pull-up resistor.  
 * @param    reg Address of Data Direction Register, such as &DDRB 
-* @param    pin Pin designaton in the interval 0 to 7
+* @param    pin Pin designation in the interval 0 to 7
 * @return   none
 */
 void gpio_mode_input_nopull(volatile uint8_t *reg, uint8_t pin);
 
 /**
 * @brief    Toggle one output pin value.
-* @param    reg Adress of Port Register, such as &PORTB
+* @param    reg Address of Port Register, such as &PORTB
 * @param    pin Pin designation in the interval 0 to 7
 * @return   none
 */
