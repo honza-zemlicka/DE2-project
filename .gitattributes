@@ -1,9 +1,9 @@
-# Ignores documentation in stats
+
 docs/** linguist-vendored
 html/** linguist-vendored
 doxygen/** linguist-vendored
 
-# Ignores every HTML files everywhere (for measure)
+# Ignores every HTML, css, js files everywhere
 *.html linguist-vendored
 *.css linguist-vendored
 *.js linguist-vendored
