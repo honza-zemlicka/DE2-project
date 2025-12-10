@@ -66,7 +66,7 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
 ## Software design
 
 <div align="center">
-    <img src="images/flowchart_main.jpg" width="30%">
+    <img src="images/flowchart_main.jpg">
     <br>
     <em>Main loop flowchart</em>
 </div>
