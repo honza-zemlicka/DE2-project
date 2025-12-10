@@ -22,12 +22,8 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
 
 ## Hardware description
 
-<div align="center">
-    <img src="images/block%20diagram.png">
-    <br>
-    <em>Hardware block diagram</em>
-</div>
-
+![Block diagram](images/block%20diagram.png "Block diagram")
+> Hardware block diagram
 
 * [Arduino Nano](datasheets/ArduinoNANO-datasheet.pdf) - main controller unit ([ATmega328P](datasheets/ATmega328P_Datasheet.pdf))
 
@@ -45,7 +41,7 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
 * [OS-1838B](datasheets/IR_receiver_vs1838b.pdf) - IR remote control receiver
 * stabilizer, buttons, connectors, batteries ...
 
-### Wiring Table
+### Wiring
 
 | Component | Arduino Pin | AVR Port | Function |
 | :--- | :---: | :---: | :--- |
@@ -64,6 +60,9 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
 | **ArduinoNano LED** | D13 | PB5 | Status Indicator |
 | **OLED SDA** | A4 | PC4 | I2C Data |
 | **OLED SCL** | A5 | PC5 | I2C Clock |
+
+![Wiring scheme](images/robot_schematic.pdf "Wiring scheme")
+> Robot wiring schematic
 
 ## Software design
 
