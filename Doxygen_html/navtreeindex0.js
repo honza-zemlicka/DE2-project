@@ -14,6 +14,9 @@ var NAVTREEINDEX0 =
 "globals_func.html":[1,1,1],
 "gpio_8h.html":[1,0,1,0,0],
 "gpio_8h_source.html":[1,0,1,0,0],
+"group___ultrasound.html":[0,4],
+"group___ultrasound.html#ga6f942e82803982b546923243b3efc8a0":[0,4,0],
+"group___ultrasound.html#gac78a99cf1102a47e19f50a67b1856f59":[0,4,1],
 "group__fryza__gpio.html":[0,1],
 "group__fryza__gpio.html#ga11a811a5bfdc13b5c1bf3773442e9bae":[0,1,10],
 "group__fryza__gpio.html#ga1e942fcd91f79d49e4ddb8d7e9d3ef95":[0,1,0],
@@ -100,5 +103,6 @@ var NAVTREEINDEX0 =
 "twi_8h_source.html":[1,0,1,2,0],
 "uart_8h.html":[1,0,1,3,0],
 "uart_8h_source.html":[1,0,1,3,0],
+"ultrasound_8h.html":[1,0,1,4,0],
 "ultrasound_8h_source.html":[1,0,1,4,0]
 };
