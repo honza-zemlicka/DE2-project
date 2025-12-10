@@ -28,6 +28,7 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
     <em>Hardware block diagram</em>
 </div>
 
+
 * [Arduino Nano](datasheets/ArduinoNANO-datasheet.pdf) - main controller unit ([ATmega328P](datasheets/ATmega328P_Datasheet.pdf))
 
 ##### Modules
