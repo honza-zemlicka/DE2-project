@@ -61,12 +61,12 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
 | **OLED SDA** | A4 | PC4 | I2C Data |
 | **OLED SCL** | A5 | PC5 | I2C Clock |
 
-### ![Wiring scheme](images/robot_schematic.pdf "Wiring scheme")
+### ![Wiring scheme](images/robot_schematic.png "Wiring scheme")
 
 ## Software design
 
 <div align="center">
-    <img src="images/main%20loop%20flowchart.png" width="30%">
+    <img src="images/flowchart_main.jpg" width="30%">
     <br>
     <em>Main loop flowchart</em>
 </div>
@@ -85,6 +85,7 @@ Upon pressing the button, the robot enters an stop state. Upon pressing the butt
     <br>
     <em>Calibration loop flowchart</em>
 </div>
+EDITEDITEDIT
 
 For calibration routine, the robot spins in place for a fixed duration, while IR line sensors values are continuously sampled, updating the minimum (black) and maximum (white) thresholds. These values are stored and used to normalize sensor readings during the main loop.
 
