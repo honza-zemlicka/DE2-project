@@ -61,8 +61,7 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
 | **OLED SDA** | A4 | PC4 | I2C Data |
 | **OLED SCL** | A5 | PC5 | I2C Clock |
 
-![Wiring scheme](images/robot_schematic.pdf "Wiring scheme")
-> Robot wiring schematic
+### ![Wiring scheme](images/robot_schematic.pdf "Wiring scheme")
 
 ## Software design
 
