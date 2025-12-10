@@ -16,7 +16,7 @@ Users can configure parameters as robot speed and control gain via remote IR con
 
 The robot’s firmware, written in C, utilizes libraries from [DE2 AVR course](https://github.com/tomas-fryza/avr-labs) – gpio, oled & twi libraries (+ uart for troubleshooting). Additionally, an ultrasound library was created to handle sensor's initialization & distance calculation.
 
-### [**Video demonstration of our project**](https://youtu.be/tJKh0oyu3Gs?si=n_vKxXadf_YJ9QNw)
+## [**Video demonstration of our project**](https://youtu.be/tJKh0oyu3Gs?si=n_vKxXadf_YJ9QNw)
 
 ![Project poster](images/poster.png "A3 project poster")
 
