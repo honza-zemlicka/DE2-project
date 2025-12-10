@@ -83,6 +83,7 @@ Upon pressing the button, the robot enters an stop state. Upon pressing the butt
 <div align="center">
 <img src="images/calibration%20flowchart.jpg" width="30%">
     <br>
+    <br>
     <em>Calibration loop flowchart</em>
 </div>
 EDITEDITEDIT
