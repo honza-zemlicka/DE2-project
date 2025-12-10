@@ -27,6 +27,8 @@ void ultrasound_init(void);
 /**
  * @brief Distance measurement.
  * Generates a trigger pulse and measures the response duration.
+ * Formula for calculation: (Time (us) * 10) / 58 = distance (mm)
+ ** To travel 1 cm, sound needs 1 / 0.0343 = 29.15 us * 2 = 58.3 us per cm
  * @return Distance in mm. Returns 0 if out of range or timeout.
  */
 uint16_t ultrasound_read(void);
