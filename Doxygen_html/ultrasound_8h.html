@@ -89,7 +89,7 @@ Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>ultrasound_init</b> (void)</td></tr>
 <tr class="memdesc:ga6f942e82803982b546923243b3efc8a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the ultrasonic sensor pins. Sets TRIG as output and ECHO as input. <br /></td></tr>
 <tr class="memitem:gac78a99cf1102a47e19f50a67b1856f59" id="r_gac78a99cf1102a47e19f50a67b1856f59"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___ultrasound.html#gac78a99cf1102a47e19f50a67b1856f59">ultrasound_read</a> (void)</td></tr>
-<tr class="memdesc:gac78a99cf1102a47e19f50a67b1856f59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance measurement. Generates a trigger pulse and measures the response duration.  <br /></td></tr>
+<tr class="memdesc:gac78a99cf1102a47e19f50a67b1856f59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance measurement. Generates a trigger pulse and measures the response duration. Formula calculation: (Time (us) * 10) / 58 = distance (mm). To travel 1 cm, sound needs 1 / 0.0343 = 29.15 us * 2 = 58.3 us per cm.  <br /></td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->
