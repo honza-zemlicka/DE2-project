@@ -1,4 +1,4 @@
-// -Eppur si muove-  line-follower v02-02
+// -Eppur si muove-        line-follower v02-02
 
 #include <avr/io.h>        // AVR device-specific IO definitions
 #include <avr/interrupt.h> // Interrupts standard C library for AVR-GCC
@@ -11,7 +11,7 @@
 #include "robot_definitions.h"
 
 // Calibration variables
-uint16_t S1K[2] = {0, 0};
+uint16_t S1K[2] = {0, 0}; // [0] = White (Max), [1] = Black (Min)
 uint16_t S2K[2] = {0, 0};
 uint16_t S3K[2] = {0, 0};
 uint16_t S4K[2] = {0, 0};
@@ -42,7 +42,6 @@ volatile uint8_t length = 0;
 volatile uint8_t reception_complete = 0;
 
 const char *encode_cmd(uint8_t command);
-const char *message;
 
 void auto_calibration();
 static inline int16_t map(int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max);
@@ -106,16 +105,16 @@ int main(void)
       error = S2 - S1;
       correction = error * gain_kp;
 
-      pwm_write(&PORTD, MOTOR_LF, constrain(motor_speed + correction, 0, 130));   // Write pwm to motors
+      pwm_write(&PORTD, MOTOR_LF, constrain(motor_speed + correction, 0, 130));   // Write PWM to motors
       pwm_write(&PORTD, MOTOR_RF, constrain(motor_speed - correction, 0, 130));
 
       if (count == 20)    // Measuring distance every 320ms
       {
-        uint16_t distance = ultrasound_read(); // Measured distance in milimeters
+        uint16_t distance = ultrasound_read(); // Measured distance in mm
 
-        if (distance > 0 && distance < 75)  // Is obstacle closer than 7,5 cm?
+        if (distance > 0 && distance < 75)  // is obstacle closer than 7,5 cm
         {
-          dodge_object(); // Try to dodge the object
+          dodge_object(); // init avoidance maneuver
         }
         count = 0; // Clear counter
       }
@@ -216,9 +215,9 @@ void auto_calibration()
 
   calib_tick = 0;
 
-  while (calib_tick < 150)
+  while (calib_tick < 150) // calibration loop
   {
-    pwm_write(&PORTB, MOTOR_LB, 150);
+    pwm_write(&PORTB, MOTOR_LB, 150); // rotate robot
     pwm_write(&PORTD, MOTOR_RF, 150);
 
     S1 = analog_read(SENSOR_CR);
@@ -251,7 +250,7 @@ void auto_calibration()
       S4K[1] = S4;
   }
 
-  // Robot alignment to line
+  // align robot to line
   do
   {
     pwm_write(&PORTD, MOTOR_LB, 100);
@@ -260,12 +259,12 @@ void auto_calibration()
     S1 = map(analog_read(SENSOR_CR), S1K[1], S1K[0], 0, 100);
     S2 = map(analog_read(SENSOR_CL), S2K[1], S2K[0], 0, 100);
 
-  } while (S1 > 50);
+  } while (S1 > 50); // stop when sensor sees the line
 
   pwm_write(&PORTB, MOTOR_LB, 0);
   pwm_write(&PORTD, MOTOR_RF, 0);
 
-  while (1)   // Waiting for run
+  while (1)   // Waiting for button press to start run
   {
     if (gpio_read(&PIND, BUTTON) == 0)
     {
@@ -280,17 +279,18 @@ void dodge_object(void)
 {
   gpio_write_high(&PORTB, USER_LED);
 
-  // Turn by 90 degrees
+  // Turn 90 degrees right
   pwm_write(&PORTD, MOTOR_LF, 30);
   pwm_write(&PORTD, MOTOR_RF, 120);
   _delay_ms(1000);
 
+  // Drive around the obstacle
   pwm_write(&PORTD, MOTOR_LF, 120);
   pwm_write(&PORTD, MOTOR_RF, 95);
 
   _delay_ms(200);
   
-  // Obstacle avoidance + search for the line
+  // Continue until line is found
   do
   {
     pwm_write(&PORTD, MOTOR_LF, 100);
@@ -301,7 +301,7 @@ void dodge_object(void)
 
   } while ((S2 > 30) || (S1 > 30));
 
-  // Robot alignment to line
+  // Align back2line
   pwm_write(&PORTD, MOTOR_LF, 30);
   pwm_write(&PORTD, MOTOR_RF, 120);
   _delay_ms(350);
@@ -329,7 +329,7 @@ void encode_frame()
   {
     if (reception_complete == 1)
     {
-      // NEC format:
+      // NEC format decoding:
       uint8_t address = (ir_data >> 24) & 0xFF;     // [31..24] Address
       uint8_t address_inv = (ir_data >> 16) & 0xFF; // [23..16] Address_inv
       uint8_t command = (ir_data >> 8) & 0xFF;      // [15..8]  Command
@@ -346,6 +346,7 @@ void encode_frame()
       delay_ir = 0;
     }
 
+    // Timeout for NEC repeat codes
     if (TIFR2 & (1 << TOV2)) // Timer2 overflow occurred
     {
       delay_ir++;
@@ -354,7 +355,7 @@ void encode_frame()
 
     if (delay_ir == 3)
     {
-      EIFR |= (1 << INTF0); // erase interrupt flag
+      EIFR |= (1 << INTF0); // clear interrupt flag
       EIMSK = (1 << INT0);  // enable INT0
       return;
     }
@@ -374,7 +375,7 @@ ISR(INT0_vect)
   uint8_t measured = TCNT2;
   uint8_t length = measured - last_time;
 
-  // Start bit
+  // NEC Start bit
   if (length > 60 && length < 100) // 5 062 us / 64 = 79 tics
   {
     ir_data = 0;
@@ -382,7 +383,7 @@ ISR(INT0_vect)
     frame_received = 0;
   }
 
-  // High
+  // HIGH
   if (length > 25 && length < 45) // 2 249 us / 64 = 35 tics
   {
     // ir_data |= (1 << bit_index);
@@ -391,7 +392,7 @@ ISR(INT0_vect)
     bit_index++;
   }
 
-  // Low
+  // LOW
   if (length > 7 && length < 25) // 1 124 us / 64 = 17,5 tics
   {
     // ir_data |= (0 << bit_index);
