@@ -8,13 +8,13 @@
 * Jan Žemlička
 
 ## Project description
-This project presents an autonomous robot designed for line following and obstacle avoidance. On startup, the robot performs an calibration routine to distinguish between black and white surfaces under current lighting conditions. It utilizes a proportional (P) control algorithm to follow the line by adjusting the speed of individual motors based on robot's deviation from the followed path.
+This project presents an autonomous robot designed for line following and obstacle avoidance. On startup, the robot performs a calibration routine to distinguish between black and white surfaces under current lighting conditions. It utilizes a proportional (P) control algorithm to follow the line by adjusting the speed of individual motors based on the robot's deviation from the followed path.
 		
-An ultrasonic sensor continuously measures the distance from obstacles. If an object is detected within a threshold distance, the robot initiates a avoidance maneuver to bypass the obstacle and return to the track.
+An ultrasonic sensor continuously measures the distance from obstacles. If an object is detected within a threshold distance, the robot initiates an avoidance maneuver to bypass the obstacle and return to the track.
 		
 Users can configure parameters as control gain and robot speed via remote IR controller. The current settings are displayed on an OLED screen.
 
-The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR course](https://github.com/tomas-fryza/avr-labs) – gpio, oled & twi libraries (+ uart for troubleshooting). Additionally, a custom ultrasound library was created to handle sensors initialization & distance calculation.
+The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR course](https://github.com/tomas-fryza/avr-labs) – gpio, oled & twi libraries (+ uart for troubleshooting). Additionally, a custom ultrasound library was created to handle sensor initialization & distance calculation.
 
 ## [**Video demonstration of our project**](https://youtu.be/tJKh0oyu3Gs?si=n_vKxXadf_YJ9QNw)
 
@@ -46,9 +46,9 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
 | Component | Arduino Pin | AVR Port | Function |
 | :--- | :---: | :---: | :--- |
 | **Left Motor FWD** | D5 | PD5 | PWM Speed Control |
-| **Left Motor BCK** | D9 | PB1 | PWM Backspeed Control|
+| **Left Motor BCK** | D9 | PB1 | PWM Reverse Control|
 | **Right Motor FWD** | D6 | PD6 | PWM Speed Control |
-| **Right Motor BCK** | D10 | PB2 | PWM Backspeed Control |
+| **Right Motor BCK** | D10 | PB2 | PWM Reverse Control |
 | **Line Sensor RR** | A0 | PC0 | IR Line Input (Right-Right) |
 | **Line Sensor CR** | A1 | PC1 | IR Line Input (Center-Right) |
 | **Line Sensor CL** | A2 | PC2 | IR Line Input (Center-Left) |
@@ -83,9 +83,9 @@ The program initializes peripherals (ADC, I2C, PWM & ultrasound) and runs a cali
 1. Reads normalized analog values from IR sensors.
 2. Calculates the error and applies P-regulator correction to motor speeds.
 3. Periodically measures distance using the ultrasound sensor.
-4. Decodes IR remote commands via interrupts (if an command is received).
+4. Decodes IR remote commands via interrupts (if a command is received).
 
-Upon pressing the button, the robot enters an stop state. Upon pressing the button again, robot resumes main loop execution.
+Upon pressing the button, the robot enters a stop state. Upon pressing the button again, robot resumes main loop execution.
 
 <div align="center">
 <img src="images/calibration%20flowchart.png" width="45%">
@@ -94,7 +94,7 @@ Upon pressing the button, the robot enters an stop state. Upon pressing the butt
     <em>Calibration loop flowchart</em>
 </div>
 
-For calibration routine, the robot spins in place for a fixed duration, while IR line sensors values are continuously sampled, updating the minimum (black) and maximum (white) thresholds. These values are stored and used to normalize sensor readings during the main loop.
+For the calibration routine, the robot spins in place for a fixed duration, while IR line sensors values are continuously sampled, updating the minimum (black) and maximum (white) thresholds. These values are stored and used to normalize sensor readings during the main loop.
 
 After the calibration time elapses, the robot aligns itself with the line and waits for a manual button press to start the main run loop.
 
