@@ -88,7 +88,7 @@ The program initializes peripherals (ADC, I2C, PWM & ultrasound) and runs a cali
 Upon pressing the button, the robot enters an stop state. Upon pressing the button again, robot resumes main loop execution.
 
 <div align="center">
-<img src="images/calibration%20flowchart.png" width="30%">
+<img src="images/calibration%20flowchart.png" width="40%">
     <br>
     <br>
     <em>Calibration loop flowchart</em>
