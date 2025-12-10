@@ -63,6 +63,13 @@ The robot’s firmware, written in C, utilizes libraries from the [DE2 AVR cours
 
 ### ![Wiring scheme](images/robot_schematic.png "Wiring scheme")
 
+#### Robot mechanical structure & PCB
+
+<p float="center">
+  <img src="images/robot_structure.jpg" width="45%" />
+  <img src="images/robot_board.png" width="45%" /> 
+</p>
+
 ## Software design
 
 <div align="center">
@@ -86,7 +93,6 @@ Upon pressing the button, the robot enters an stop state. Upon pressing the butt
     <br>
     <em>Calibration loop flowchart</em>
 </div>
-EDITEDITEDIT
 
 For calibration routine, the robot spins in place for a fixed duration, while IR line sensors values are continuously sampled, updating the minimum (black) and maximum (white) thresholds. These values are stored and used to normalize sensor readings during the main loop.
 
